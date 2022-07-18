@@ -35,4 +35,6 @@ std::ostream& operator<<(std::ostream& os, const sf::Rect<T>& rect)
 
 bool operator==(const sf::Transform& lhs, const Approx<sf::Transform>& rhs);
 
+bool compareImages(const std::string& expected, const std::string& actual);
+
 #endif // SFML_TESTUTILITIES_GRAPHICS_HPP
