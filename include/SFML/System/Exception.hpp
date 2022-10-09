@@ -22,36 +22,25 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef SFML_SYSTEM_HPP
-#define SFML_SYSTEM_HPP
+#ifndef SFML_EXCEPTION_HPP
+#define SFML_EXCEPTION_HPP
 
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include <exception>
 
-#include <SFML/Config.hpp>
+namespace sf
+{
+class Exception : public std::exception
+{
+public:
+    [[nodiscard]] const char* what() const noexcept override;
+};
 
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Clock.hpp>
-#include <SFML/System/Err.hpp>
-#include <SFML/System/Exception.hpp>
-#include <SFML/System/FileInputStream.hpp>
-#include <SFML/System/InputStream.hpp>
-#include <SFML/System/MemoryInputStream.hpp>
-#include <SFML/System/Sleep.hpp>
-#include <SFML/System/String.hpp>
-#include <SFML/System/Time.hpp>
-#include <SFML/System/Utf.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/System/Vector3.hpp>
+// Inline definition required due to STL type derivation
+#include <SFML/System/Exception.inl>
 
-#endif // SFML_SYSTEM_HPP
+} // namespace sf
 
-////////////////////////////////////////////////////////////
-/// \defgroup system System module
-///
-/// Base module of SFML, defining various utilities. It provides
-/// vector classes, Unicode strings and conversion functions,
-/// threads and mutexes, timing classes.
-///
-////////////////////////////////////////////////////////////
+#endif // SFML_EXCEPTION_HPP

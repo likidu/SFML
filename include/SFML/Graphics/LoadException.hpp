@@ -22,36 +22,35 @@
 //
 ////////////////////////////////////////////////////////////
 
-#ifndef SFML_SYSTEM_HPP
-#define SFML_SYSTEM_HPP
+#ifndef SFML_LOADEXCEPTION_HPP
+#define SFML_LOADEXCEPTION_HPP
 
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-
-#include <SFML/Config.hpp>
-
-#include <SFML/System/Angle.hpp>
-#include <SFML/System/Clock.hpp>
-#include <SFML/System/Err.hpp>
 #include <SFML/System/Exception.hpp>
-#include <SFML/System/FileInputStream.hpp>
-#include <SFML/System/InputStream.hpp>
-#include <SFML/System/MemoryInputStream.hpp>
-#include <SFML/System/Sleep.hpp>
-#include <SFML/System/String.hpp>
-#include <SFML/System/Time.hpp>
-#include <SFML/System/Utf.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/System/Vector3.hpp>
+#include <filesystem>
+#include <sstream>
+#include <string>
 
-#endif // SFML_SYSTEM_HPP
+namespace sf
+{
+class LoadException final : public Exception
+{
+public:
+    LoadException(const std::string& message);
+    LoadException(const std::filesystem::path& filePath, const std::string& message);
 
-////////////////////////////////////////////////////////////
-/// \defgroup system System module
-///
-/// Base module of SFML, defining various utilities. It provides
-/// vector classes, Unicode strings and conversion functions,
-/// threads and mutexes, timing classes.
-///
-////////////////////////////////////////////////////////////
+    [[nodiscard]] const char* what() const noexcept override;
+
+private:
+    std::string m_message;
+};
+
+// Inline definition required due to STL type derivation
+#include <SFML/Graphics/LoadException.inl>
+
+} // namespace sf
+
+
+#endif // SFML_LOADEXCEPTION_HPP

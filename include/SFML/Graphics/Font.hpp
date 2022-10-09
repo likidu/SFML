@@ -69,14 +69,6 @@ public:
 
 public:
     ////////////////////////////////////////////////////////////
-    /// \brief Default constructor
-    ///
-    /// This constructor defines an empty font
-    ///
-    ////////////////////////////////////////////////////////////
-    Font();
-
-    ////////////////////////////////////////////////////////////
     /// \brief Copy constructor
     ///
     /// \param copy Instance to copy
@@ -124,7 +116,7 @@ public:
     /// \see loadFromMemory, loadFromStream
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] bool loadFromFile(const std::filesystem::path& filename);
+    [[nodiscard]] static Font loadFromFile(const std::filesystem::path& filename);
 
     ////////////////////////////////////////////////////////////
     /// \brief Load the font from a file in memory
@@ -145,7 +137,7 @@ public:
     /// \see loadFromFile, loadFromStream
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] bool loadFromMemory(const void* data, std::size_t sizeInBytes);
+    [[nodiscard]] static Font loadFromMemory(const void* data, std::size_t sizeInBytes);
 
     ////////////////////////////////////////////////////////////
     /// \brief Load the font from a custom stream
@@ -167,7 +159,7 @@ public:
     /// \see loadFromFile, loadFromMemory
     ///
     ////////////////////////////////////////////////////////////
-    [[nodiscard]] bool loadFromStream(InputStream& stream);
+    [[nodiscard]] static Font loadFromStream(InputStream& stream);
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the font information
@@ -331,6 +323,14 @@ public:
 
 private:
     ////////////////////////////////////////////////////////////
+    /// \brief Default constructor
+    ///
+    /// This constructor defines an empty font
+    ///
+    ////////////////////////////////////////////////////////////
+    Font();
+
+    ////////////////////////////////////////////////////////////
     /// \brief Structure defining a row of glyphs
     ///
     ////////////////////////////////////////////////////////////
@@ -475,14 +475,8 @@ private:
 ///
 /// Usage example:
 /// \code
-/// // Declare a new font
-/// sf::Font font;
-///
-/// // Load it from a file
-/// if (!font.loadFromFile("arial.ttf"))
-/// {
-///     // error...
-/// }
+/// // Create a new font by loading it from a file
+/// sf::Font font = sf::Font::loadFromFile("arial.ttf");
 ///
 /// // Create a text which uses our font
 /// sf::Text text1;
