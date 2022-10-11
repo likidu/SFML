@@ -101,9 +101,7 @@ namespace
         Bool checkEvent(::Display*, XEvent* event, XPointer userData)
         {
             // Just check if the event matches the window
-            // The input method sometimes sends ClientMessages with a different window ID,
-            // our event loop has to process them for the IM to work
-            return (event->xany.window == reinterpret_cast< ::Window >(userData)) || (event->type == ClientMessage);
+            return event->xany.window == reinterpret_cast< ::Window >(userData);
         }
 
         // Find the name of the current executable
@@ -805,7 +803,7 @@ WindowImplX11::~WindowImplX11()
 
     // Close the input method
     if (m_inputMethod)
-        CloseXIM(m_inputMethod);
+        XCloseIM(m_inputMethod);
 
     // Close the connection with the X server
     CloseDisplay(m_display);
@@ -1609,7 +1607,7 @@ void WindowImplX11::initialize()
     using namespace WindowsImplX11Impl;
 
     // Create the input context
-    m_inputMethod = OpenXIM();
+    m_inputMethod = XOpenIM(m_display, NULL, NULL, NULL);
 
     if (m_inputMethod)
     {
@@ -1847,31 +1845,27 @@ bool WindowImplX11::processEvent(XEvent& windowEvent)
         // Close event
         case ClientMessage:
         {
-            // Input methods might want random ClientMessage events
-            if (!XFilterEvent(&windowEvent, None))
+            static Atom wmProtocols = getAtom("WM_PROTOCOLS");
+
+            // Handle window manager protocol messages we support
+            if (windowEvent.xclient.message_type == wmProtocols)
             {
-                static Atom wmProtocols = getAtom("WM_PROTOCOLS");
+                static Atom wmDeleteWindow = getAtom("WM_DELETE_WINDOW");
+                static Atom netWmPing = ewmhSupported() ? getAtom("_NET_WM_PING", true) : None;
 
-                // Handle window manager protocol messages we support
-                if (windowEvent.xclient.message_type == wmProtocols)
+                if ((windowEvent.xclient.format == 32) && (windowEvent.xclient.data.l[0]) == static_cast<long>(wmDeleteWindow))
                 {
-                    static Atom wmDeleteWindow = getAtom("WM_DELETE_WINDOW");
-                    static Atom netWmPing = ewmhSupported() ? getAtom("_NET_WM_PING", true) : None;
+                    // Handle the WM_DELETE_WINDOW message
+                    Event event;
+                    event.type = Event::Closed;
+                    pushEvent(event);
+                }
+                else if (netWmPing && (windowEvent.xclient.format == 32) && (windowEvent.xclient.data.l[0]) == static_cast<long>(netWmPing))
+                {
+                    // Handle the _NET_WM_PING message, send pong back to WM to show that we are responsive
+                    windowEvent.xclient.window = DefaultRootWindow(m_display);
 
-                    if ((windowEvent.xclient.format == 32) && (windowEvent.xclient.data.l[0]) == static_cast<long>(wmDeleteWindow))
-                    {
-                        // Handle the WM_DELETE_WINDOW message
-                        Event event;
-                        event.type = Event::Closed;
-                        pushEvent(event);
-                    }
-                    else if (netWmPing && (windowEvent.xclient.format == 32) && (windowEvent.xclient.data.l[0]) == static_cast<long>(netWmPing))
-                    {
-                        // Handle the _NET_WM_PING message, send pong back to WM to show that we are responsive
-                        windowEvent.xclient.window = DefaultRootWindow(m_display);
-
-                        XSendEvent(m_display, DefaultRootWindow(m_display), False, SubstructureNotifyMask | SubstructureRedirectMask, &windowEvent);
-                    }
+                    XSendEvent(m_display, DefaultRootWindow(m_display), False, SubstructureNotifyMask | SubstructureRedirectMask, &windowEvent);
                 }
             }
             break;
@@ -1910,7 +1904,7 @@ bool WindowImplX11::processEvent(XEvent& windowEvent)
                 if (m_inputContext)
                 {
                     Status status;
-                    Uint8  keyBuffer[64];
+                    Uint8  keyBuffer[16];
 
                     int length = Xutf8LookupString(
                         m_inputContext,
@@ -1921,26 +1915,16 @@ bool WindowImplX11::processEvent(XEvent& windowEvent)
                         &status
                     );
 
-                    if (status == XBufferOverflow)
-                        err() << "A TextEntered event has more than 64 bytes of UTF-8 input, and "
-                                 "has been discarded\nThis means either you have typed a very long string "
-                                 "(more than 20 chars), or your input method is broken in obscure ways." << std::endl;
-                    else if (status == XLookupChars)
+                    if (length > 0)
                     {
-                        // There might be more than 1 characters in this event,
-                        // so we must iterate it
                         Uint32 unicode = 0;
-                        Uint8* iter = keyBuffer;
-                        while (iter < keyBuffer + length)
+                        Utf8::decode(keyBuffer, keyBuffer + length, unicode, 0);
+                        if (unicode != 0)
                         {
-                            iter = Utf8::decode(iter, keyBuffer + length, unicode, 0);
-                            if (unicode != 0)
-                            {
-                                Event textEvent;
-                                textEvent.type         = Event::TextEntered;
-                                textEvent.text.unicode = unicode;
-                                pushEvent(textEvent);
-                            }
+                            Event textEvent;
+                            textEvent.type         = Event::TextEntered;
+                            textEvent.text.unicode = unicode;
+                            pushEvent(textEvent);
                         }
                     }
                 }
