@@ -25,64 +25,65 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Window/WindowImpl.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Window/JoystickManager.hpp>
-#include <SFML/Window/SensorManager.hpp>
+#include <SFML/Window/WindowImpl.hpp>
+// #include <SFML/Window/JoystickManager.hpp>
 #include <SFML/System/Sleep.hpp>
+// #include <SFML/Window/SensorManager.hpp>
 #include <algorithm>
 #include <cmath>
 
 #if defined(SFML_SYSTEM_WINDOWS)
 
     #include <SFML/Window/Win32/WindowImplWin32.hpp>
-    typedef sf::priv::WindowImplWin32 WindowImplType;
+typedef sf::priv::WindowImplWin32 WindowImplType;
 
     #include <SFML/Window/Win32/VulkanImplWin32.hpp>
-    typedef sf::priv::VulkanImplWin32 VulkanImplType;
+typedef sf::priv::VulkanImplWin32 VulkanImplType;
 
-#elif defined(SFML_SYSTEM_LINUX) || defined(SFML_SYSTEM_FREEBSD) || defined(SFML_SYSTEM_OPENBSD) || defined(SFML_SYSTEM_NETBSD)
+#elif defined(SFML_SYSTEM_LINUX) || defined(SFML_SYSTEM_FREEBSD) || defined(SFML_SYSTEM_OPENBSD) ||                    \
+    defined(SFML_SYSTEM_NETBSD) || defined(SFML_SYSTEM_EMSCRIPTEN)
 
     #if defined(SFML_USE_DRM)
 
         #include <SFML/Window/DRM/WindowImplDRM.hpp>
-        typedef sf::priv::WindowImplDRM WindowImplType;
+typedef sf::priv::WindowImplDRM WindowImplType;
 
         #define SFML_VULKAN_IMPLEMENTATION_NOT_AVAILABLE
 
+    // TODO: If it applies to WASM?
     #else
 
         #include <SFML/Window/Unix/WindowImplX11.hpp>
-        typedef sf::priv::WindowImplX11 WindowImplType;
+typedef sf::priv::WindowImplX11 WindowImplType;
 
         #include <SFML/Window/Unix/VulkanImplX11.hpp>
-        typedef sf::priv::VulkanImplX11 VulkanImplType;
+typedef sf::priv::VulkanImplX11 VulkanImplType;
 
     #endif
 
 #elif defined(SFML_SYSTEM_MACOS)
 
     #include <SFML/Window/OSX/WindowImplCocoa.hpp>
-    typedef sf::priv::WindowImplCocoa WindowImplType;
+typedef sf::priv::WindowImplCocoa WindowImplType;
 
     #define SFML_VULKAN_IMPLEMENTATION_NOT_AVAILABLE
 
 #elif defined(SFML_SYSTEM_IOS)
 
     #include <SFML/Window/iOS/WindowImplUIKit.hpp>
-    typedef sf::priv::WindowImplUIKit WindowImplType;
+typedef sf::priv::WindowImplUIKit WindowImplType;
 
     #define SFML_VULKAN_IMPLEMENTATION_NOT_AVAILABLE
 
 #elif defined(SFML_SYSTEM_ANDROID)
 
     #include <SFML/Window/Android/WindowImplAndroid.hpp>
-    typedef sf::priv::WindowImplAndroid WindowImplType;
+typedef sf::priv::WindowImplAndroid WindowImplType;
 
     #define SFML_VULKAN_IMPLEMENTATION_NOT_AVAILABLE
 
 #endif
-
 
 namespace sf
 {
@@ -90,36 +91,34 @@ namespace priv
 {
 
 ////////////////////////////////////////////////////////////
-WindowImpl* WindowImpl::create(VideoMode mode, const String& title, Uint32 style, const ContextSettings& settings)
+WindowImpl *WindowImpl::create(VideoMode mode, const String &title, Uint32 style, const ContextSettings &settings)
 {
     return new WindowImplType(mode, title, style, settings);
 }
 
-
 ////////////////////////////////////////////////////////////
-WindowImpl* WindowImpl::create(WindowHandle handle)
+WindowImpl *WindowImpl::create(WindowHandle handle)
 {
     return new WindowImplType(handle);
 }
 
-
+// FIXME: Disable for WASM
 ////////////////////////////////////////////////////////////
-WindowImpl::WindowImpl() :
-m_joystickThreshold(0.1f)
-{
-    // Get the initial joystick states
-    JoystickManager::getInstance().update();
-    for (unsigned int i = 0; i < Joystick::Count; ++i)
-    {
-        m_joystickStates[i] = JoystickManager::getInstance().getState(i);
-        std::fill_n(m_previousAxes[i], static_cast<std::size_t>(Joystick::AxisCount), 0.f);
-    }
+// WindowImpl::WindowImpl() :
+// m_joystickThreshold(0.1f)
+// {
+//     // Get the initial joystick states
+//     JoystickManager::getInstance().update();
+//     for (unsigned int i = 0; i < Joystick::Count; ++i)
+//     {
+//         m_joystickStates[i] = JoystickManager::getInstance().getState(i);
+//         std::fill_n(m_previousAxes[i], static_cast<std::size_t>(Joystick::AxisCount), 0.f);
+//     }
 
-    // Get the initial sensor states
-    for (unsigned int i = 0; i < Sensor::Count; ++i)
-        m_sensorValue[i] = Vector3f(0, 0, 0);
-}
-
+//     // Get the initial sensor states
+//     for (unsigned int i = 0; i < Sensor::Count; ++i)
+//         m_sensorValue[i] = Vector3f(0, 0, 0);
+// }
 
 ////////////////////////////////////////////////////////////
 WindowImpl::~WindowImpl()
@@ -127,23 +126,23 @@ WindowImpl::~WindowImpl()
     // Nothing to do
 }
 
+// FIXME: Disable for WASM
+////////////////////////////////////////////////////////////
+// void WindowImpl::setJoystickThreshold(float threshold)
+// {
+//     m_joystickThreshold = threshold;
+// }
 
 ////////////////////////////////////////////////////////////
-void WindowImpl::setJoystickThreshold(float threshold)
-{
-    m_joystickThreshold = threshold;
-}
-
-
-////////////////////////////////////////////////////////////
-bool WindowImpl::popEvent(Event& event, bool block)
+bool WindowImpl::popEvent(Event &event, bool block)
 {
     // If the event queue is empty, let's first check if new events are available from the OS
     if (m_events.empty())
     {
         // Get events from the system
-        processJoystickEvents();
-        processSensorEvents();
+        // FIXME: Disable for WASM
+        // processJoystickEvents();
+        // processSensorEvents();
         processEvents();
 
         // In blocking mode, we must process events until one is triggered
@@ -155,8 +154,9 @@ bool WindowImpl::popEvent(Event& event, bool block)
             while (m_events.empty())
             {
                 sleep(milliseconds(10));
-                processJoystickEvents();
-                processSensorEvents();
+                // FIXME: Disable for WASM
+                // processJoystickEvents();
+                // processSensorEvents();
                 processEvents();
             }
         }
@@ -174,127 +174,125 @@ bool WindowImpl::popEvent(Event& event, bool block)
     return false;
 }
 
-
 ////////////////////////////////////////////////////////////
-void WindowImpl::pushEvent(const Event& event)
+void WindowImpl::pushEvent(const Event &event)
 {
     m_events.push(event);
 }
 
+// FIXME: Disable for WASM
+////////////////////////////////////////////////////////////
+// void WindowImpl::processJoystickEvents()
+// {
+//     // First update the global joystick states
+//     JoystickManager::getInstance().update();
+
+//     for (unsigned int i = 0; i < Joystick::Count; ++i)
+//     {
+//         // Copy the previous state of the joystick and get the new one
+//         JoystickState previousState = m_joystickStates[i];
+//         m_joystickStates[i]         = JoystickManager::getInstance().getState(i);
+
+//         // Connection state
+//         bool connected = m_joystickStates[i].connected;
+//         if (previousState.connected ^ connected)
+//         {
+//             Event event;
+//             event.type                      = connected ? Event::JoystickConnected : Event::JoystickDisconnected;
+//             event.joystickButton.joystickId = i;
+//             pushEvent(event);
+
+//             // Clear previous axes positions
+//             if (connected) std::fill_n(m_previousAxes[i], static_cast<std::size_t>(Joystick::AxisCount), 0.f);
+//         }
+
+//         if (connected)
+//         {
+//             JoystickCaps caps = JoystickManager::getInstance().getCapabilities(i);
+
+//             // Axes
+//             for (unsigned int j = 0; j < Joystick::AxisCount; ++j)
+//             {
+//                 if (caps.axes[j])
+//                 {
+//                     Joystick::Axis axis = static_cast<Joystick::Axis>(j);
+//                     float prevPos       = m_previousAxes[i][axis];
+//                     float currPos       = m_joystickStates[i].axes[axis];
+//                     if (std::abs(currPos - prevPos) >= m_joystickThreshold)
+//                     {
+//                         Event event;
+//                         event.type                    = Event::JoystickMoved;
+//                         event.joystickMove.joystickId = i;
+//                         event.joystickMove.axis       = axis;
+//                         event.joystickMove.position   = currPos;
+//                         pushEvent(event);
+
+//                         m_previousAxes[i][axis] = currPos;
+//                     }
+//                 }
+//             }
+
+//             // Buttons
+//             for (unsigned int j = 0; j < caps.buttonCount; ++j)
+//             {
+//                 bool prevPressed = previousState.buttons[j];
+//                 bool currPressed = m_joystickStates[i].buttons[j];
+
+//                 if (prevPressed ^ currPressed)
+//                 {
+//                     Event event;
+//                     event.type = currPressed ? Event::JoystickButtonPressed : Event::JoystickButtonReleased;
+//                     event.joystickButton.joystickId = i;
+//                     event.joystickButton.button     = j;
+//                     pushEvent(event);
+//                 }
+//             }
+//         }
+//     }
+// }
+
+// FIXME: Disable for WASM
+////////////////////////////////////////////////////////////
+// void WindowImpl::processSensorEvents()
+// {
+//     // First update the sensor states
+//     SensorManager::getInstance().update();
+
+//     for (unsigned int i = 0; i < Sensor::Count; ++i)
+//     {
+//         Sensor::Type sensor = static_cast<Sensor::Type>(i);
+
+//         // Only process enabled sensors
+//         if (SensorManager::getInstance().isEnabled(sensor))
+//         {
+//             // Copy the previous value of the sensor and get the new one
+//             Vector3f previousValue = m_sensorValue[i];
+//             m_sensorValue[i]       = SensorManager::getInstance().getValue(sensor);
+
+//             // If the value has changed, trigger an event
+//             if (m_sensorValue[i] != previousValue) // @todo use a threshold?
+//             {
+//                 Event event;
+//                 event.type        = Event::SensorChanged;
+//                 event.sensor.type = sensor;
+//                 event.sensor.x    = m_sensorValue[i].x;
+//                 event.sensor.y    = m_sensorValue[i].y;
+//                 event.sensor.z    = m_sensorValue[i].z;
+//                 pushEvent(event);
+//             }
+//         }
+//     }
+// }
 
 ////////////////////////////////////////////////////////////
-void WindowImpl::processJoystickEvents()
-{
-    // First update the global joystick states
-    JoystickManager::getInstance().update();
-
-    for (unsigned int i = 0; i < Joystick::Count; ++i)
-    {
-        // Copy the previous state of the joystick and get the new one
-        JoystickState previousState = m_joystickStates[i];
-        m_joystickStates[i] = JoystickManager::getInstance().getState(i);
-
-        // Connection state
-        bool connected = m_joystickStates[i].connected;
-        if (previousState.connected ^ connected)
-        {
-            Event event;
-            event.type = connected ? Event::JoystickConnected : Event::JoystickDisconnected;
-            event.joystickButton.joystickId = i;
-            pushEvent(event);
-
-            // Clear previous axes positions
-            if (connected)
-                std::fill_n(m_previousAxes[i], static_cast<std::size_t>(Joystick::AxisCount), 0.f);
-        }
-
-        if (connected)
-        {
-            JoystickCaps caps = JoystickManager::getInstance().getCapabilities(i);
-
-            // Axes
-            for (unsigned int j = 0; j < Joystick::AxisCount; ++j)
-            {
-                if (caps.axes[j])
-                {
-                    Joystick::Axis axis = static_cast<Joystick::Axis>(j);
-                    float prevPos = m_previousAxes[i][axis];
-                    float currPos = m_joystickStates[i].axes[axis];
-                    if (std::abs(currPos - prevPos) >= m_joystickThreshold)
-                    {
-                        Event event;
-                        event.type = Event::JoystickMoved;
-                        event.joystickMove.joystickId = i;
-                        event.joystickMove.axis = axis;
-                        event.joystickMove.position = currPos;
-                        pushEvent(event);
-
-                        m_previousAxes[i][axis] = currPos;
-                    }
-                }
-            }
-
-            // Buttons
-            for (unsigned int j = 0; j < caps.buttonCount; ++j)
-            {
-                bool prevPressed = previousState.buttons[j];
-                bool currPressed = m_joystickStates[i].buttons[j];
-
-                if (prevPressed ^ currPressed)
-                {
-                    Event event;
-                    event.type = currPressed ? Event::JoystickButtonPressed : Event::JoystickButtonReleased;
-                    event.joystickButton.joystickId = i;
-                    event.joystickButton.button = j;
-                    pushEvent(event);
-                }
-            }
-        }
-    }
-}
-
-
-////////////////////////////////////////////////////////////
-void WindowImpl::processSensorEvents()
-{
-    // First update the sensor states
-    SensorManager::getInstance().update();
-
-    for (unsigned int i = 0; i < Sensor::Count; ++i)
-    {
-        Sensor::Type sensor = static_cast<Sensor::Type>(i);
-
-        // Only process enabled sensors
-        if (SensorManager::getInstance().isEnabled(sensor))
-        {
-            // Copy the previous value of the sensor and get the new one
-            Vector3f previousValue = m_sensorValue[i];
-            m_sensorValue[i] = SensorManager::getInstance().getValue(sensor);
-
-            // If the value has changed, trigger an event
-            if (m_sensorValue[i] != previousValue) // @todo use a threshold?
-            {
-                Event event;
-                event.type = Event::SensorChanged;
-                event.sensor.type = sensor;
-                event.sensor.x = m_sensorValue[i].x;
-                event.sensor.y = m_sensorValue[i].y;
-                event.sensor.z = m_sensorValue[i].z;
-                pushEvent(event);
-            }
-        }
-    }
-}
-
-
-////////////////////////////////////////////////////////////
-bool WindowImpl::createVulkanSurface(const VkInstance& instance, VkSurfaceKHR& surface, const VkAllocationCallbacks* allocator)
+bool WindowImpl::createVulkanSurface(const VkInstance &instance, VkSurfaceKHR &surface,
+                                     const VkAllocationCallbacks *allocator)
 {
 #if defined(SFML_VULKAN_IMPLEMENTATION_NOT_AVAILABLE)
 
-    (void) instance;
-    (void) surface;
-    (void) allocator;
+    (void)instance;
+    (void)surface;
+    (void)allocator;
     return false;
 
 #else

@@ -75,7 +75,7 @@ elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Android")
 
 # TODO: WASM
 elseif(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
-    set(SFML_OS_WASM 1)
+    set(SFML_OS_EMSCRIPTEN 1)
 
     # use the OpenGL ES implementation on WASM
     set(OPENGL_ES 1)

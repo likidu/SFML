@@ -4,14 +4,17 @@ set(SRCROOT ${PROJECT_SOURCE_DIR}/src/SFML/Window)
 
 # all source files
 set(SRC
-    ${INCROOT}/Clipboard.hpp
-    ${SRCROOT}/Clipboard.cpp
-    ${SRCROOT}/ClipboardImpl.hpp
+
+    # TODO: Disable Clipboard, Cursor, Joystick, Sensor as a workaround for WASM
+    # ${INCROOT}/Clipboard.hpp
+    # ${SRCROOT}/Clipboard.cpp
+    # ${SRCROOT}/ClipboardImpl.hpp
     ${SRCROOT}/Context.cpp
     ${INCROOT}/Context.hpp
-    ${SRCROOT}/Cursor.cpp
-    ${INCROOT}/Cursor.hpp
-    ${SRCROOT}/CursorImpl.hpp
+
+    # ${SRCROOT}/Cursor.cpp
+    # ${INCROOT}/Cursor.hpp
+    # ${SRCROOT}/CursorImpl.hpp
     ${INCROOT}/Export.hpp
     ${SRCROOT}/GlContext.cpp
     ${SRCROOT}/GlContext.hpp
@@ -20,22 +23,24 @@ set(SRC
     ${INCROOT}/ContextSettings.hpp
     ${INCROOT}/Event.hpp
     ${SRCROOT}/InputImpl.hpp
-    ${INCROOT}/Joystick.hpp
-    ${SRCROOT}/Joystick.cpp
-    ${SRCROOT}/JoystickImpl.hpp
-    ${SRCROOT}/JoystickManager.cpp
-    ${SRCROOT}/JoystickManager.hpp
+
+    # ${INCROOT}/Joystick.hpp
+    # ${SRCROOT}/Joystick.cpp
+    # ${SRCROOT}/JoystickImpl.hpp
+    # ${SRCROOT}/JoystickManager.cpp
+    # ${SRCROOT}/JoystickManager.hpp
     ${INCROOT}/Keyboard.hpp
     ${SRCROOT}/Keyboard.cpp
     ${INCROOT}/Mouse.hpp
     ${SRCROOT}/Mouse.cpp
     ${INCROOT}/Touch.hpp
     ${SRCROOT}/Touch.cpp
-    ${INCROOT}/Sensor.hpp
-    ${SRCROOT}/Sensor.cpp
-    ${SRCROOT}/SensorImpl.hpp
-    ${SRCROOT}/SensorManager.cpp
-    ${SRCROOT}/SensorManager.hpp
+
+    # ${INCROOT}/Sensor.hpp
+    # ${SRCROOT}/Sensor.cpp
+    # ${SRCROOT}/SensorImpl.hpp
+    # ${SRCROOT}/SensorManager.cpp
+    # ${SRCROOT}/SensorManager.hpp
     ${SRCROOT}/VideoMode.cpp
     ${INCROOT}/VideoMode.hpp
     ${SRCROOT}/VideoModeImpl.hpp
@@ -71,6 +76,7 @@ if(SFML_OS_WINDOWS)
         ${SRCROOT}/Win32/WindowImplWin32.cpp
         ${SRCROOT}/Win32/WindowImplWin32.hpp
     )
+
     if(SFML_OPENGL_ES)
         set(PLATFORM_SRC
             ${PLATFORM_SRC}
@@ -86,6 +92,7 @@ if(SFML_OS_WINDOWS)
             ${SRCROOT}/Win32/WglContext.hpp
         )
     endif()
+
     source_group("windows" FILES ${PLATFORM_SRC})
 
     # make sure that we use the Unicode version of the Win API functions
@@ -128,6 +135,7 @@ elseif(SFML_OS_LINUX OR SFML_OS_FREEBSD OR SFML_OS_OPENBSD OR SFML_OS_NETBSD)
             ${SRCROOT}/Unix/WindowImplX11.cpp
             ${SRCROOT}/Unix/WindowImplX11.hpp
         )
+
         if(SFML_OPENGL_ES)
             set(PLATFORM_SRC
                 ${PLATFORM_SRC}
@@ -137,13 +145,14 @@ elseif(SFML_OS_LINUX OR SFML_OS_FREEBSD OR SFML_OS_OPENBSD OR SFML_OS_NETBSD)
                 ${SRCROOT}/EglContext.hpp
             )
         else()
-             set(PLATFORM_SRC
+            set(PLATFORM_SRC
                 ${PLATFORM_SRC}
                 ${SRCROOT}/Unix/GlxContext.cpp
                 ${SRCROOT}/Unix/GlxContext.hpp
             )
         endif()
     endif()
+
     if(SFML_OS_LINUX)
         set(PLATFORM_SRC
             ${PLATFORM_SRC}
@@ -169,6 +178,7 @@ elseif(SFML_OS_LINUX OR SFML_OS_FREEBSD OR SFML_OS_OPENBSD OR SFML_OS_NETBSD)
             ${SRCROOT}/NetBSD/JoystickImpl.hpp
         )
     endif()
+
     source_group("unix" FILES ${PLATFORM_SRC})
 elseif(SFML_OS_MACOSX)
     set(PLATFORM_SRC
@@ -276,7 +286,8 @@ endif()
 
 # define the sfml-window target
 sfml_add_library(sfml-window
-                 SOURCES ${SRC} ${PLATFORM_SRC})
+    SOURCES ${SRC} ${PLATFORM_SRC})
+
 # DRM libraries
 if(SFML_OS_LINUX OR SFML_OS_FREEBSD OR SFML_OS_OPENBSD OR SFML_OS_NETBSD)
     if(SFML_USE_DRM)
@@ -292,13 +303,14 @@ if(SFML_OS_LINUX OR SFML_OS_FREEBSD OR SFML_OS_OPENBSD OR SFML_OS_NETBSD)
         target_link_libraries(sfml-window PRIVATE X11)
     endif()
 endif()
+
 target_link_libraries(sfml-window PUBLIC sfml-system)
 
 # glad sources
 target_include_directories(sfml-window SYSTEM PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/glad/include")
 
 # When static linking on macOS, we need to add this flag for objective C to work
-if ((NOT BUILD_SHARED_LIBS) AND SFML_OS_MACOSX)
+if((NOT BUILD_SHARED_LIBS) AND SFML_OS_MACOSX)
     target_link_libraries(sfml-window PRIVATE -ObjC)
 endif()
 
@@ -308,7 +320,7 @@ target_include_directories(sfml-window PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/he
 # CMake 3.11 and later prefer to choose GLVND, but we choose legacy OpenGL for backward compability
 # (unless the OpenGL_GL_PREFERENCE was explicitly set)
 # See CMP0072 for more details (cmake --help-policy CMP0072)
-if ((NOT ${CMAKE_VERSION} VERSION_LESS 3.11) AND (NOT OpenGL_GL_PREFERENCE))
+if((NOT ${CMAKE_VERSION} VERSION_LESS 3.11) AND(NOT OpenGL_GL_PREFERENCE))
     set(OpenGL_GL_PREFERENCE "LEGACY")
 endif()
 
@@ -329,6 +341,7 @@ endif()
 if(SFML_OS_WINDOWS AND NOT SFML_COMPILER_MSVC)
     include(CheckIncludeFile)
     check_include_file(dinput.h DINPUT_H_FOUND)
+
     if(NOT DINPUT_H_FOUND)
         target_include_directories(sfml-window PRIVATE "${PROJECT_SOURCE_DIR}/extlibs/headers/mingw")
     endif()

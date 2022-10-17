@@ -23,28 +23,28 @@
 ////////////////////////////////////////////////////////////
 
 #ifndef SFML_WINDOWBASE_HPP
-#define SFML_WINDOWBASE_HPP
+    #define SFML_WINDOWBASE_HPP
 
-////////////////////////////////////////////////////////////
-// Headers
-////////////////////////////////////////////////////////////
-#include <SFML/Window/Cursor.hpp>
-#include <SFML/Window/Export.hpp>
-#include <SFML/Window/VideoMode.hpp>
-#include <SFML/Window/Vulkan.hpp>
-#include <SFML/Window/WindowHandle.hpp>
-#include <SFML/Window/WindowStyle.hpp>
-#include <SFML/System/Clock.hpp>
-#include <SFML/System/NonCopyable.hpp>
-#include <SFML/System/String.hpp>
-#include <SFML/System/Vector2.hpp>
-
+    ////////////////////////////////////////////////////////////
+    // Headers
+    ////////////////////////////////////////////////////////////
+    #include <SFML/System/Clock.hpp>
+    #include <SFML/System/NonCopyable.hpp>
+    #include <SFML/System/String.hpp>
+    #include <SFML/System/Vector2.hpp>
+    // FIXME: Disable for WASM
+    // #include <SFML/Window/Cursor.hpp>
+    #include <SFML/Window/Export.hpp>
+    #include <SFML/Window/VideoMode.hpp>
+    #include <SFML/Window/Vulkan.hpp>
+    #include <SFML/Window/WindowHandle.hpp>
+    #include <SFML/Window/WindowStyle.hpp>
 
 namespace sf
 {
 namespace priv
 {
-    class WindowImpl;
+class WindowImpl;
 }
 
 class Event;
@@ -55,8 +55,7 @@ class Event;
 ////////////////////////////////////////////////////////////
 class SFML_WINDOW_API WindowBase : NonCopyable
 {
-public:
-
+  public:
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
     ///
@@ -80,7 +79,7 @@ public:
     /// \param style %Window style, a bitwise OR combination of sf::Style enumerators
     ///
     ////////////////////////////////////////////////////////////
-    WindowBase(VideoMode mode, const String& title, Uint32 style = Style::Default);
+    WindowBase(VideoMode mode, const String &title, Uint32 style = Style::Default);
 
     ////////////////////////////////////////////////////////////
     /// \brief Construct the window from an existing control
@@ -110,7 +109,7 @@ public:
     /// \param style %Window style, a bitwise OR combination of sf::Style enumerators
     ///
     ////////////////////////////////////////////////////////////
-    virtual void create(VideoMode mode, const String& title, Uint32 style = Style::Default);
+    virtual void create(VideoMode mode, const String &title, Uint32 style = Style::Default);
 
     ////////////////////////////////////////////////////////////
     /// \brief Create (or recreate) the window from an existing control
@@ -167,7 +166,7 @@ public:
     /// \see waitEvent
     ///
     ////////////////////////////////////////////////////////////
-    bool pollEvent(Event& event);
+    bool pollEvent(Event &event);
 
     ////////////////////////////////////////////////////////////
     /// \brief Wait for an event and return it
@@ -194,7 +193,7 @@ public:
     /// \see pollEvent
     ///
     ////////////////////////////////////////////////////////////
-    bool waitEvent(Event& event);
+    bool waitEvent(Event &event);
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the position of the window
@@ -218,7 +217,7 @@ public:
     /// \see getPosition
     ///
     ////////////////////////////////////////////////////////////
-    void setPosition(const Vector2i& position);
+    void setPosition(const Vector2i &position);
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the size of the rendering region of the window
@@ -241,7 +240,7 @@ public:
     /// \see getSize
     ///
     ////////////////////////////////////////////////////////////
-    void setSize(const Vector2u& size);
+    void setSize(const Vector2u &size);
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window
@@ -251,7 +250,7 @@ public:
     /// \see setIcon
     ///
     ////////////////////////////////////////////////////////////
-    void setTitle(const String& title);
+    void setTitle(const String &title);
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the window's icon
@@ -270,7 +269,7 @@ public:
     /// \see setTitle
     ///
     ////////////////////////////////////////////////////////////
-    void setIcon(unsigned int width, unsigned int height, const Uint8* pixels);
+    void setIcon(unsigned int width, unsigned int height, const Uint8 *pixels);
 
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the window
@@ -282,6 +281,7 @@ public:
     ////////////////////////////////////////////////////////////
     void setVisible(bool visible);
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the mouse cursor
     ///
@@ -290,8 +290,9 @@ public:
     /// \param visible True to show the mouse cursor, false to hide it
     ///
     ////////////////////////////////////////////////////////////
-    void setMouseCursorVisible(bool visible);
+    // void setMouseCursorVisible(bool visible);
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Grab or release the mouse cursor
     ///
@@ -303,8 +304,9 @@ public:
     /// \param grabbed True to enable, false to disable
     ///
     ////////////////////////////////////////////////////////////
-    void setMouseCursorGrabbed(bool grabbed);
+    // void setMouseCursorGrabbed(bool grabbed);
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Set the displayed cursor to a native system cursor
     ///
@@ -322,7 +324,7 @@ public:
     /// \see sf::Cursor::loadFromPixels
     ///
     ////////////////////////////////////////////////////////////
-    void setMouseCursor(const Cursor& cursor);
+    // void setMouseCursor(const Cursor &cursor);
 
     ////////////////////////////////////////////////////////////
     /// \brief Enable or disable automatic key-repeat
@@ -338,6 +340,7 @@ public:
     ////////////////////////////////////////////////////////////
     void setKeyRepeatEnabled(bool enabled);
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Change the joystick threshold
     ///
@@ -349,7 +352,7 @@ public:
     /// \param threshold New threshold, in the range [0, 100]
     ///
     ////////////////////////////////////////////////////////////
-    void setJoystickThreshold(float threshold);
+    // void setJoystickThreshold(float threshold);
 
     ////////////////////////////////////////////////////////////
     /// \brief Request the current window to be made the active
@@ -404,10 +407,10 @@ public:
     /// \return True if surface creation was successful, false otherwise
     ///
     ////////////////////////////////////////////////////////////
-    bool createVulkanSurface(const VkInstance& instance, VkSurfaceKHR& surface, const VkAllocationCallbacks* allocator = 0);
+    bool createVulkanSurface(const VkInstance &instance, VkSurfaceKHR &surface,
+                             const VkAllocationCallbacks *allocator = 0);
 
-protected:
-
+  protected:
     ////////////////////////////////////////////////////////////
     /// \brief Function called after the window has been created
     ///
@@ -427,8 +430,7 @@ protected:
     ////////////////////////////////////////////////////////////
     virtual void onResize();
 
-private:
-
+  private:
     friend class Window;
 
     ////////////////////////////////////////////////////////////
@@ -443,7 +445,7 @@ private:
     /// \param event Event to filter
     ///
     ////////////////////////////////////////////////////////////
-    bool filterEvent(const Event& event);
+    bool filterEvent(const Event &event);
 
     ////////////////////////////////////////////////////////////
     /// \brief Perform some common internal initializations
@@ -457,7 +459,7 @@ private:
     /// \return The fullscreen window or NULL if there is none
     ///
     ////////////////////////////////////////////////////////////
-    const WindowBase* getFullscreenWindow();
+    const WindowBase *getFullscreenWindow();
 
     ////////////////////////////////////////////////////////////
     /// \brief Set a window as the fullscreen window
@@ -465,20 +467,18 @@ private:
     /// \param window Window to set as fullscreen window
     ///
     ////////////////////////////////////////////////////////////
-    void setFullscreenWindow(const WindowBase* window);
+    void setFullscreenWindow(const WindowBase *window);
 
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    priv::WindowImpl* m_impl;           //!< Platform-specific implementation of the window
-    Vector2u          m_size;           //!< Current size of the window
+    priv::WindowImpl *m_impl; //!< Platform-specific implementation of the window
+    Vector2u m_size;          //!< Current size of the window
 };
 
 } // namespace sf
 
-
 #endif // SFML_WINDOWBASE_HPP
-
 
 ////////////////////////////////////////////////////////////
 /// \class sf::WindowBase

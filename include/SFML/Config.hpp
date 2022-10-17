@@ -25,14 +25,12 @@
 #ifndef SFML_CONFIG_HPP
 #define SFML_CONFIG_HPP
 
-
 ////////////////////////////////////////////////////////////
 // Define the SFML version
 ////////////////////////////////////////////////////////////
 #define SFML_VERSION_MAJOR 2
 #define SFML_VERSION_MINOR 5
 #define SFML_VERSION_PATCH 1
-
 
 ////////////////////////////////////////////////////////////
 // Identify the operating system
@@ -78,7 +76,7 @@
 
     #elif defined(__linux__)
 
-         // Linux
+        // Linux
         #define SFML_SYSTEM_LINUX
 
     #elif defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
@@ -96,6 +94,11 @@
         // NetBSD
         #define SFML_SYSTEM_NETBSD
 
+    #elif defined(__EMSCRIPTEN__)
+
+        // Emscripten
+        #define SFML_SYSTEM_EMSCRIPTEN
+
     #else
 
         // Unsupported UNIX system
@@ -110,7 +113,6 @@
 
 #endif
 
-
 ////////////////////////////////////////////////////////////
 // Define a portable debug macro
 ////////////////////////////////////////////////////////////
@@ -119,7 +121,6 @@
     #define SFML_DEBUG
 
 #endif
-
 
 ////////////////////////////////////////////////////////////
 // Define helpers to create portable import / export macros for each module
@@ -135,7 +136,7 @@
         // For Visual C++ compilers, we also need to turn off this annoying C4251 warning
         #ifdef _MSC_VER
 
-            #pragma warning(disable: 4251)
+            #pragma warning(disable : 4251)
 
         #endif
 
@@ -145,8 +146,8 @@
 
             // GCC 4 has special keywords for showing/hidding symbols,
             // the same keyword is used for both importing and exporting
-            #define SFML_API_EXPORT __attribute__ ((__visibility__ ("default")))
-            #define SFML_API_IMPORT __attribute__ ((__visibility__ ("default")))
+            #define SFML_API_EXPORT __attribute__((__visibility__("default")))
+            #define SFML_API_IMPORT __attribute__((__visibility__("default")))
 
         #else
 
@@ -165,7 +166,6 @@
     #define SFML_API_IMPORT
 
 #endif
-
 
 ////////////////////////////////////////////////////////////
 // Cross-platform warning for deprecated functions and classes
@@ -193,56 +193,55 @@
 #elif defined(__GNUC__)
 
     // g++ and Clang
-    #define SFML_DEPRECATED __attribute__ ((deprecated))
+    #define SFML_DEPRECATED __attribute__((deprecated))
 
 #else
 
     // Other compilers are not supported, leave class or function as-is.
-    // With a bit of luck, the #pragma directive works, otherwise users get a warning (no error!) for unrecognized #pragma.
+    // With a bit of luck, the #pragma directive works, otherwise users get a warning (no error!) for unrecognized
+    // #pragma.
     #pragma message("SFML_DEPRECATED is not supported for your compiler, please contact the SFML team")
     #define SFML_DEPRECATED
 
 #endif
-
 
 ////////////////////////////////////////////////////////////
 // Define portable fixed-size types
 ////////////////////////////////////////////////////////////
 namespace sf
 {
-    // All "common" platforms use the same size for char, short and int
-    // (basically there are 3 types for 3 sizes, so no other match is possible),
-    // we can use them without doing any kind of check
+// All "common" platforms use the same size for char, short and int
+// (basically there are 3 types for 3 sizes, so no other match is possible),
+// we can use them without doing any kind of check
 
-    // 8 bits integer types
-    typedef signed   char Int8;
-    typedef unsigned char Uint8;
+// 8 bits integer types
+typedef signed char Int8;
+typedef unsigned char Uint8;
 
-    // 16 bits integer types
-    typedef signed   short Int16;
-    typedef unsigned short Uint16;
+// 16 bits integer types
+typedef signed short Int16;
+typedef unsigned short Uint16;
 
-    // 32 bits integer types
-    typedef signed   int Int32;
-    typedef unsigned int Uint32;
+// 32 bits integer types
+typedef signed int Int32;
+typedef unsigned int Uint32;
 
-    // 64 bits integer types
-    #if defined(_MSC_VER)
-        typedef signed   __int64 Int64;
-        typedef unsigned __int64 Uint64;
-    #else
-        #if defined(__clang__)
-            #pragma clang diagnostic push
-            #pragma clang diagnostic ignored "-Wc++11-long-long"
-        #endif
-        typedef signed   long long Int64;
-        typedef unsigned long long Uint64;
-        #if defined(__clang__)
-            #pragma clang diagnostic pop
-        #endif
+// 64 bits integer types
+#if defined(_MSC_VER)
+typedef signed __int64 Int64;
+typedef unsigned __int64 Uint64;
+#else
+    #if defined(__clang__)
+        #pragma clang diagnostic push
+        #pragma clang diagnostic ignored "-Wc++11-long-long"
     #endif
+typedef signed long long Int64;
+typedef unsigned long long Uint64;
+    #if defined(__clang__)
+        #pragma clang diagnostic pop
+    #endif
+#endif
 
 } // namespace sf
-
 
 #endif // SFML_CONFIG_HPP

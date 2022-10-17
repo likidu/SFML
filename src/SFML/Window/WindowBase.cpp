@@ -25,50 +25,38 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Window/WindowBase.hpp>
-#include <SFML/Window/ContextSettings.hpp>
-#include <SFML/Window/WindowImpl.hpp>
 #include <SFML/System/Err.hpp>
-
+#include <SFML/Window/ContextSettings.hpp>
+#include <SFML/Window/WindowBase.hpp>
+#include <SFML/Window/WindowImpl.hpp>
 
 namespace
 {
-    // A nested named namespace is used here to allow unity builds of SFML.
-    namespace WindowsBaseImpl
-    {
-        const sf::WindowBase* fullscreenWindow = NULL;
-    }
+// A nested named namespace is used here to allow unity builds of SFML.
+namespace WindowsBaseImpl
+{
+const sf::WindowBase *fullscreenWindow = NULL;
 }
-
+} // namespace
 
 namespace sf
 {
 ////////////////////////////////////////////////////////////
-WindowBase::WindowBase() :
-m_impl          (NULL),
-m_size          (0, 0)
+WindowBase::WindowBase() : m_impl(NULL), m_size(0, 0)
 {
-
 }
 
-
 ////////////////////////////////////////////////////////////
-WindowBase::WindowBase(VideoMode mode, const String& title, Uint32 style) :
-m_impl          (NULL),
-m_size          (0, 0)
+WindowBase::WindowBase(VideoMode mode, const String &title, Uint32 style) : m_impl(NULL), m_size(0, 0)
 {
     WindowBase::create(mode, title, style);
 }
 
-
 ////////////////////////////////////////////////////////////
-WindowBase::WindowBase(WindowHandle handle) :
-m_impl          (NULL),
-m_size          (0, 0)
+WindowBase::WindowBase(WindowHandle handle) : m_impl(NULL), m_size(0, 0)
 {
     WindowBase::create(handle);
 }
-
 
 ////////////////////////////////////////////////////////////
 WindowBase::~WindowBase()
@@ -76,9 +64,8 @@ WindowBase::~WindowBase()
     close();
 }
 
-
 ////////////////////////////////////////////////////////////
-void WindowBase::create(VideoMode mode, const String& title, Uint32 style)
+void WindowBase::create(VideoMode mode, const String &title, Uint32 style)
 {
     // Destroy the previous window implementation
     close();
@@ -106,16 +93,15 @@ void WindowBase::create(VideoMode mode, const String& title, Uint32 style)
         }
     }
 
-    // Check validity of style according to the underlying platform
-    #if defined(SFML_SYSTEM_IOS) || defined(SFML_SYSTEM_ANDROID)
-        if (style & Style::Fullscreen)
-            style &= ~static_cast<Uint32>(Style::Titlebar);
-        else
-            style |= Style::Titlebar;
-    #else
-        if ((style & Style::Close) || (style & Style::Resize))
-            style |= Style::Titlebar;
-    #endif
+// Check validity of style according to the underlying platform
+#if defined(SFML_SYSTEM_IOS) || defined(SFML_SYSTEM_ANDROID)
+    if (style & Style::Fullscreen)
+        style &= ~static_cast<Uint32>(Style::Titlebar);
+    else
+        style |= Style::Titlebar;
+#else
+    if ((style & Style::Close) || (style & Style::Resize)) style |= Style::Titlebar;
+#endif
 
     // Recreate the window implementation
     m_impl = priv::WindowImpl::create(mode, title, style, ContextSettings(0, 0, 0, 0, 0, 0xFFFFFFFF, false));
@@ -123,7 +109,6 @@ void WindowBase::create(VideoMode mode, const String& title, Uint32 style)
     // Perform common initializations
     initialize();
 }
-
 
 ////////////////////////////////////////////////////////////
 void WindowBase::create(WindowHandle handle)
@@ -138,7 +123,6 @@ void WindowBase::create(WindowHandle handle)
     initialize();
 }
 
-
 ////////////////////////////////////////////////////////////
 void WindowBase::close()
 {
@@ -147,10 +131,8 @@ void WindowBase::close()
     m_impl = NULL;
 
     // Update the fullscreen window
-    if (this == getFullscreenWindow())
-        setFullscreenWindow(NULL);
+    if (this == getFullscreenWindow()) setFullscreenWindow(NULL);
 }
-
 
 ////////////////////////////////////////////////////////////
 bool WindowBase::isOpen() const
@@ -158,9 +140,8 @@ bool WindowBase::isOpen() const
     return m_impl != NULL;
 }
 
-
 ////////////////////////////////////////////////////////////
-bool WindowBase::pollEvent(Event& event)
+bool WindowBase::pollEvent(Event &event)
 {
     if (m_impl && m_impl->popEvent(event, false))
     {
@@ -172,9 +153,8 @@ bool WindowBase::pollEvent(Event& event)
     }
 }
 
-
 ////////////////////////////////////////////////////////////
-bool WindowBase::waitEvent(Event& event)
+bool WindowBase::waitEvent(Event &event)
 {
     if (m_impl && m_impl->popEvent(event, true))
     {
@@ -186,21 +166,17 @@ bool WindowBase::waitEvent(Event& event)
     }
 }
 
-
 ////////////////////////////////////////////////////////////
 Vector2i WindowBase::getPosition() const
 {
     return m_impl ? m_impl->getPosition() : Vector2i();
 }
 
-
 ////////////////////////////////////////////////////////////
-void WindowBase::setPosition(const Vector2i& position)
+void WindowBase::setPosition(const Vector2i &position)
 {
-    if (m_impl)
-        m_impl->setPosition(position);
+    if (m_impl) m_impl->setPosition(position);
 }
-
 
 ////////////////////////////////////////////////////////////
 Vector2u WindowBase::getSize() const
@@ -208,9 +184,8 @@ Vector2u WindowBase::getSize() const
     return m_size;
 }
 
-
 ////////////////////////////////////////////////////////////
-void WindowBase::setSize(const Vector2u& size)
+void WindowBase::setSize(const Vector2u &size)
 {
     if (m_impl)
     {
@@ -225,78 +200,64 @@ void WindowBase::setSize(const Vector2u& size)
     }
 }
 
-
 ////////////////////////////////////////////////////////////
-void WindowBase::setTitle(const String& title)
+void WindowBase::setTitle(const String &title)
 {
-    if (m_impl)
-        m_impl->setTitle(title);
+    if (m_impl) m_impl->setTitle(title);
 }
 
-
 ////////////////////////////////////////////////////////////
-void WindowBase::setIcon(unsigned int width, unsigned int height, const Uint8* pixels)
+void WindowBase::setIcon(unsigned int width, unsigned int height, const Uint8 *pixels)
 {
-    if (m_impl)
-        m_impl->setIcon(width, height, pixels);
+    if (m_impl) m_impl->setIcon(width, height, pixels);
 }
-
 
 ////////////////////////////////////////////////////////////
 void WindowBase::setVisible(bool visible)
 {
-    if (m_impl)
-        m_impl->setVisible(visible);
+    if (m_impl) m_impl->setVisible(visible);
 }
 
-
+// FIXME: Disable for WASM
 ////////////////////////////////////////////////////////////
-void WindowBase::setMouseCursorVisible(bool visible)
-{
-    if (m_impl)
-        m_impl->setMouseCursorVisible(visible);
-}
+// void WindowBase::setMouseCursorVisible(bool visible)
+// {
+//     if (m_impl) m_impl->setMouseCursorVisible(visible);
+// }
 
-
+// FIXME: Disable for WASM
 ////////////////////////////////////////////////////////////
-void WindowBase::setMouseCursorGrabbed(bool grabbed)
-{
-    if (m_impl)
-        m_impl->setMouseCursorGrabbed(grabbed);
-}
+// void WindowBase::setMouseCursorGrabbed(bool grabbed)
+// {
+//     if (m_impl) m_impl->setMouseCursorGrabbed(grabbed);
+// }
 
-
+// FIXME: Disable for WASM
 ////////////////////////////////////////////////////////////
-void WindowBase::setMouseCursor(const Cursor& cursor)
-{
-    if (m_impl)
-        m_impl->setMouseCursor(cursor.getImpl());
-}
-
+// void WindowBase::setMouseCursor(const Cursor &cursor)
+// {
+//     if (m_impl) m_impl->setMouseCursor(cursor.getImpl());
+// }
 
 ////////////////////////////////////////////////////////////
 void WindowBase::setKeyRepeatEnabled(bool enabled)
 {
-    if (m_impl)
-        m_impl->setKeyRepeatEnabled(enabled);
+    if (m_impl) m_impl->setKeyRepeatEnabled(enabled);
 }
 
-
+// FIXME: Disable for WASM
 ////////////////////////////////////////////////////////////
-void WindowBase::setJoystickThreshold(float threshold)
-{
-    if (m_impl)
-        m_impl->setJoystickThreshold(threshold);
-}
-
+// void WindowBase::setJoystickThreshold(float threshold)
+// {
+//     if (m_impl)
+//         m_impl->setJoystickThreshold(threshold);
+// }
 
 ////////////////////////////////////////////////////////////
 void WindowBase::requestFocus()
 {
-    if (m_impl)
-        m_impl->requestFocus();
+    if (m_impl) m_impl->requestFocus();
 }
-
 
 ////////////////////////////////////////////////////////////
 bool WindowBase::hasFocus() const
@@ -304,20 +265,18 @@ bool WindowBase::hasFocus() const
     return m_impl && m_impl->hasFocus();
 }
 
-
 ////////////////////////////////////////////////////////////
 WindowHandle WindowBase::getSystemHandle() const
 {
     return m_impl ? m_impl->getSystemHandle() : 0;
 }
 
-
 ////////////////////////////////////////////////////////////
-bool WindowBase::createVulkanSurface(const VkInstance& instance, VkSurfaceKHR& surface, const VkAllocationCallbacks* allocator)
+bool WindowBase::createVulkanSurface(const VkInstance &instance, VkSurfaceKHR &surface,
+                                     const VkAllocationCallbacks *allocator)
 {
     return m_impl ? m_impl->createVulkanSurface(instance, surface, allocator) : false;
 }
-
 
 ////////////////////////////////////////////////////////////
 void WindowBase::onCreate()
@@ -325,16 +284,14 @@ void WindowBase::onCreate()
     // Nothing by default
 }
 
-
 ////////////////////////////////////////////////////////////
 void WindowBase::onResize()
 {
     // Nothing by default
 }
 
-
 ////////////////////////////////////////////////////////////
-bool WindowBase::filterEvent(const Event& event)
+bool WindowBase::filterEvent(const Event &event)
 {
     // Notify resize events to the derived class
     if (event.type == Event::Resized)
@@ -350,13 +307,13 @@ bool WindowBase::filterEvent(const Event& event)
     return true;
 }
 
-
 ////////////////////////////////////////////////////////////
 void WindowBase::initialize()
 {
     // Setup default behaviors (to get a consistent behavior across different implementations)
     setVisible(true);
-    setMouseCursorVisible(true);
+    // FIXME: Disable for WASM
+    // setMouseCursorVisible(true);
     setKeyRepeatEnabled(true);
 
     // Get and cache the initial size of the window
@@ -366,16 +323,14 @@ void WindowBase::initialize()
     onCreate();
 }
 
-
 ////////////////////////////////////////////////////////////
-const WindowBase* WindowBase::getFullscreenWindow()
+const WindowBase *WindowBase::getFullscreenWindow()
 {
     return WindowsBaseImpl::fullscreenWindow;
 }
 
-
 ////////////////////////////////////////////////////////////
-void WindowBase::setFullscreenWindow(const WindowBase* window)
+void WindowBase::setFullscreenWindow(const WindowBase *window)
 {
     WindowsBaseImpl::fullscreenWindow = window;
 }

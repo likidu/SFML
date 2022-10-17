@@ -25,12 +25,10 @@
 #ifndef SFML_OPENGL_HPP
 #define SFML_OPENGL_HPP
 
-
 ////////////////////////////////////////////////////////////
 /// Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Config.hpp>
-
 
 ////////////////////////////////////////////////////////////
 /// This file just includes the OpenGL headers,
@@ -45,7 +43,8 @@
 
     #include <GL/gl.h>
 
-#elif defined(SFML_SYSTEM_LINUX) || defined(SFML_SYSTEM_FREEBSD) || defined(SFML_SYSTEM_OPENBSD) || defined(SFML_SYSTEM_NETBSD)
+#elif defined(SFML_SYSTEM_LINUX) || defined(SFML_SYSTEM_FREEBSD) || defined(SFML_SYSTEM_OPENBSD) ||                    \
+    defined(SFML_SYSTEM_NETBSD)
 
     #if defined(SFML_OPENGL_ES)
         #include <GLES/gl.h>
@@ -58,21 +57,25 @@
 
     #include <OpenGL/gl.h>
 
-#elif defined (SFML_SYSTEM_IOS)
+#elif defined(SFML_SYSTEM_IOS)
 
     #include <OpenGLES/ES1/gl.h>
     #include <OpenGLES/ES1/glext.h>
 
-#elif defined (SFML_SYSTEM_ANDROID)
+#elif defined(SFML_SYSTEM_ANDROID)
 
     #include <GLES/gl.h>
     #include <GLES/glext.h>
-    
+
     // We're not using OpenGL ES 2+ yet, but we can use the sRGB extension
-    #include <GLES2/gl2platform.h>
     #include <GLES2/gl2ext.h>
+    #include <GLES2/gl2platform.h>
+
+#elif defined(SFML_SYSTEM_EMSCRIPTEN)
+    // TODO: Is this file enough?
+    // $EMSDK/upstream/emscripten/cache/sysroot/include
+    #include <GL/gl.h>
 
 #endif
-
 
 #endif // SFML_OPENGL_HPP

@@ -32,15 +32,17 @@
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/System/String.hpp>
 #include <SFML/Window/ContextSettings.hpp>
-#include <SFML/Window/CursorImpl.hpp>
+// FIXME: Disable for WASM
+// #include <SFML/Window/CursorImpl.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Window/Joystick.hpp>
-#include <SFML/Window/JoystickImpl.hpp>
-#include <SFML/Window/Sensor.hpp>
-#include <SFML/Window/SensorImpl.hpp>
+// FIXME: Disable for WASM
+// #include <SFML/Window/Joystick.hpp>
+// #include <SFML/Window/JoystickImpl.hpp>
+// #include <SFML/Window/Sensor.hpp>
+// #include <SFML/Window/SensorImpl.hpp>
 #include <SFML/Window/VideoMode.hpp>
-#include <SFML/Window/WindowHandle.hpp>
 #include <SFML/Window/Window.hpp>
+#include <SFML/Window/WindowHandle.hpp>
 #include <queue>
 #include <set>
 
@@ -56,8 +58,7 @@ namespace priv
 ////////////////////////////////////////////////////////////
 class WindowImpl : NonCopyable
 {
-public:
-
+  public:
     ////////////////////////////////////////////////////////////
     /// \brief Create a new window depending on the current OS
     ///
@@ -69,7 +70,7 @@ public:
     /// \return Pointer to the created window (don't forget to delete it)
     ///
     ////////////////////////////////////////////////////////////
-    static WindowImpl* create(VideoMode mode, const String& title, Uint32 style, const ContextSettings& settings);
+    static WindowImpl *create(VideoMode mode, const String &title, Uint32 style, const ContextSettings &settings);
 
     ////////////////////////////////////////////////////////////
     /// \brief Create a new window depending on to the current OS
@@ -79,16 +80,16 @@ public:
     /// \return Pointer to the created window (don't forget to delete it)
     ///
     ////////////////////////////////////////////////////////////
-    static WindowImpl* create(WindowHandle handle);
+    static WindowImpl *create(WindowHandle handle);
 
-public:
-
+  public:
     ////////////////////////////////////////////////////////////
     /// \brief Destructor
     ///
     ////////////////////////////////////////////////////////////
     virtual ~WindowImpl();
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Change the joystick threshold, i.e. the value below which
     ///        no move event will be generated
@@ -96,7 +97,7 @@ public:
     /// \param threshold New threshold, in range [0, 100]
     ///
     ////////////////////////////////////////////////////////////
-    void setJoystickThreshold(float threshold);
+    // void setJoystickThreshold(float threshold);
 
     ////////////////////////////////////////////////////////////
     /// \brief Return the next window event available
@@ -112,7 +113,7 @@ public:
     /// \param block Use true to block the thread until an event arrives
     ///
     ////////////////////////////////////////////////////////////
-    bool popEvent(Event& event, bool block);
+    bool popEvent(Event &event, bool block);
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the OS-specific handle of the window
@@ -136,7 +137,7 @@ public:
     /// \param position New position of the window, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setPosition(const Vector2i& position) = 0;
+    virtual void setPosition(const Vector2i &position) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Get the client size of the window
@@ -152,7 +153,7 @@ public:
     /// \param size New size, in pixels
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setSize(const Vector2u& size) = 0;
+    virtual void setSize(const Vector2u &size) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the title of the window
@@ -160,7 +161,7 @@ public:
     /// \param title New title
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setTitle(const String& title) = 0;
+    virtual void setTitle(const String &title) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Change the window's icon
@@ -170,7 +171,7 @@ public:
     /// \param pixels Pointer to the pixels in memory, format must be RGBA 32 bits
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setIcon(unsigned int width, unsigned int height, const Uint8* pixels) = 0;
+    virtual void setIcon(unsigned int width, unsigned int height, const Uint8 *pixels) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the window
@@ -180,29 +181,32 @@ public:
     ////////////////////////////////////////////////////////////
     virtual void setVisible(bool visible) = 0;
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Show or hide the mouse cursor
     ///
     /// \param visible True to show, false to hide
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setMouseCursorVisible(bool visible) = 0;
+    // virtual void setMouseCursorVisible(bool visible) = 0;
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Grab or release the mouse cursor and keeps it from leaving
     ///
     /// \param grabbed True to enable, false to disable
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setMouseCursorGrabbed(bool grabbed) = 0;
+    // virtual void setMouseCursorGrabbed(bool grabbed) = 0;
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Set the displayed cursor to a native system cursor
     ///
     /// \param cursor Native system cursor type to display
     ///
     ////////////////////////////////////////////////////////////
-    virtual void setMouseCursor(const CursorImpl& cursor) = 0;
+    // virtual void setMouseCursor(const CursorImpl &cursor) = 0;
 
     ////////////////////////////////////////////////////////////
     /// \brief Enable or disable automatic key-repeat
@@ -237,10 +241,9 @@ public:
     /// \return True if surface creation was successful, false otherwise
     ///
     ////////////////////////////////////////////////////////////
-    bool createVulkanSurface(const VkInstance& instance, VkSurfaceKHR& surface, const VkAllocationCallbacks* allocator);
+    bool createVulkanSurface(const VkInstance &instance, VkSurfaceKHR &surface, const VkAllocationCallbacks *allocator);
 
-protected:
-
+  protected:
     ////////////////////////////////////////////////////////////
     /// \brief Default constructor
     ///
@@ -257,7 +260,7 @@ protected:
     /// \param event Event to push
     ///
     ////////////////////////////////////////////////////////////
-    void pushEvent(const Event& event);
+    void pushEvent(const Event &event);
 
     ////////////////////////////////////////////////////////////
     /// \brief Process incoming events from the operating system
@@ -265,33 +268,37 @@ protected:
     ////////////////////////////////////////////////////////////
     virtual void processEvents() = 0;
 
-private:
-
+  private:
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Read the joysticks state and generate the appropriate events
     ///
     ////////////////////////////////////////////////////////////
-    void processJoystickEvents();
+    // void processJoystickEvents();
 
+    // FIXME: Disable for WASM
     ////////////////////////////////////////////////////////////
     /// \brief Read the sensors state and generate the appropriate events
     ///
     ////////////////////////////////////////////////////////////
-    void processSensorEvents();
+    // void processSensorEvents();
 
     ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
-    std::queue<Event> m_events;                                              //!< Queue of available events
-    JoystickState     m_joystickStates[Joystick::Count];                     //!< Previous state of the joysticks
-    Vector3f          m_sensorValue[Sensor::Count];                          //!< Previous value of the sensors
-    float             m_joystickThreshold;                                   //!< Joystick threshold (minimum motion for "move" event to be generated)
-    float             m_previousAxes[Joystick::Count][Joystick::AxisCount];  //!< Position of each axis last time a move event triggered, in range [-100, 100]
+    std::queue<Event> m_events; //!< Queue of available events
+    // FIXME: Disable for WASM
+    // JoystickState m_joystickStates[Joystick::Count]; //!< Previous state of the joysticks
+    // Vector3f m_sensorValue[Sensor::Count];           //!< Previous value of the sensors
+    // FIXME: Disable for WASM
+    // float             m_joystickThreshold;                                   //!< Joystick threshold (minimum motion
+    // for "move" event to be generated)
+    // float m_previousAxes[Joystick::Count][Joystick::AxisCount]; //!< Position of each axis last time a move event
+    //!< triggered, in range [-100, 100]
 };
 
 } // namespace priv
 
 } // namespace sf
-
 
 #endif // SFML_WINDOWIMPL_HPP
